@@ -31,19 +31,13 @@ const App = () => {
 
   useEffect(() => {
     if (firstRender.current) {
-      console.log("first call to useeffect");
-
-      //firstRender.current = false;
+      firstRender.current = false;
     } else {
-      console.log("second call to useeffect");
-
       localStorage.setItem("Todo", JSON.stringify([...todos]));
     }
   }, [todos]);
 
   useEffect(() => {
-    console.log("third call to useeffect");
-
     if (localStorage.getItem("Todo") !== null) {
       const newTodos = localStorage.getItem("Todo");
       setTodos(JSON.parse([...todos, newTodos]));
