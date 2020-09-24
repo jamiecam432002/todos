@@ -1,26 +1,77 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect, useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const firstRender = useRef(true);
+  const [inputValue, setInputValue] = useState("");
+  const [todos, setTodos] = useState([]);
+
+  const addTodo = (e) => {
+    e.preventDefault();
+    console.log(e);
+    if (inputValue.trim() === "") {
+      return;
+    }
+
+    setTodos([
+      ...todos,
+      {
+        text: inputValue,
+        id: uuidv4(),
+      },
+    ]);
+
+    setInputValue("");
+  };
+
+  const deleteTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  useEffect(() => {
+    if (firstRender.current) {
+      console.log("first call to useeffect");
+
+      //firstRender.current = false;
+    } else {
+      console.log("second call to useeffect");
+
+      localStorage.setItem("Todo", JSON.stringify([...todos]));
+    }
+  }, [todos]);
+
+  useEffect(() => {
+    console.log("third call to useeffect");
+
+    if (localStorage.getItem("Todo") !== null) {
+      const newTodos = localStorage.getItem("Todo");
+      setTodos(JSON.parse([...todos, newTodos]));
+    }
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="container">
+        <form onSubmit={addTodo}>
+          <input
+            autoFocus
+            type="text"
+            placeholder="Add a todo"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          <button type="submit">Add Todo</button>
+        </form>
+        {todos.map((todo) => (
+          <div className="todo" key={todo.id}>
+            <p>{todo.text}</p>
+            <i className="fas fa-trash" onClick={() => deleteTodo(todo.id)}></i>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+};
 
 export default App;
